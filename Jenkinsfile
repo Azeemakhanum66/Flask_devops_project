@@ -2,36 +2,41 @@ pipeline {
     agent any
 
     environment {
-        DOCKER_HUB_REPO = "azeemakhanum/flask-hello-world"
+        DOCKER_HUB_REPO = "azeemakhanum/flask-hello-world"  // ✅ Your Docker Hub repo
         CONTAINER_NAME = "flask-hello-world"
+        DOCKERHUB_CREDENTIALS = credentials('dockerhub-credentials') // ✅ Use the same ID you gave while adding Jenkins credentials
     }
 
     stages {
-        // No explicit checkout stage needed when using Pipeline from SCM
-
         stage('Build') {
             steps {
-                echo '🔨 Building Docker image...'
-                bat "docker image build -t %DOCKER_HUB_REPO%:latest ."
+                echo 'Building Docker Image...'
+                sh 'docker image build -t $DOCKER_HUB_REPO:latest .'
             }
         }
 
         stage('Test') {
             steps {
-                echo '🧪 Running tests...'
-                bat "docker stop %CONTAINER_NAME% || exit 0"
-                bat "docker rm %CONTAINER_NAME% || exit 0"
-                // Use sh inside docker container because your image is Linux-based
-                bat "docker run --name %CONTAINER_NAME% %DOCKER_HUB_REPO% sh -c \"pytest test.py && flake8\""
+                echo 'Running Tests...'
+                sh 'docker stop $CONTAINER_NAME || true'
+                sh 'docker rm $CONTAINER_NAME || true'
+                sh 'docker run --name $CONTAINER_NAME $DOCKER_HUB_REPO /bin/bash -c "pytest test.py && flake8"'
+            }
+        }
+
+        stage('Push') {
+            steps {
+                echo 'Pushing Docker Image to Docker Hub...'
+                sh 'echo $DOCKERHUB_CREDENTIALS_PSW | docker login -u $DOCKERHUB_CREDENTIALS_USR --password-stdin'
+                sh 'docker push $DOCKER_HUB_REPO:latest'
             }
         }
 
         stage('Deploy') {
             steps {
-                echo '🚀 Deploying Flask app...'
-                bat "docker stop %CONTAINER_NAME% || exit 0"
-                bat "docker rm %CONTAINER_NAME% || exit 0"
-                bat "docker run -d -p 5000:5000 --name %CONTAINER_NAME% %DOCKER_HUB_REPO%"
+                echo 'Deploying to Kubernetes (Minikube)...'
+                sh 'minikube kubectl -- apply -f deployment.yaml'
+                sh 'minikube kubectl -- apply -f service.yaml'
             }
         }
     }
