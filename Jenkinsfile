@@ -28,11 +28,10 @@ pipeline {
             }
         }
         stage('Deploy') {
-            steps {
-                echo 'Deploying....'
-                bat 'minikube kubectl -- apply -f deployment.yaml'
-                bat 'minikube kubectl -- apply -f service.yaml'
-            }
-        }
+    steps {
+        echo 'Deploying....'
+        bat '"C:\\minikube\\minikube.exe" kubectl -- apply -f deployment.yaml'
+        bat '"C:\\minikube\\minikube.exe" kubectl -- apply -f service.yaml'
     }
+}
 }
