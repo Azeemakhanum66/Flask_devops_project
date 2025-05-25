@@ -30,10 +30,9 @@ pipeline {
         stage('Deploy') {
             steps {
                 echo 'Deploying....'
-                bat '"C:\\minikube\\minikube.exe" kubectl --kubeconfig="C:\\Users\\Admin\\.kube\\config" apply -f deployment.yaml'
-                bat '"C:\\minikube\\minikube.exe" kubectl --kubeconfig="C:\\Users\\Admin\\.kube\\config" apply -f service.yaml'
+                bat '"C:\\minikube\\minikube.exe" kubectl -- apply -f deployment.yaml'
+                bat '"C:\\minikube\\minikube.exe" kubectl -- apply -f service.yaml'
             }
         }
-
     }
 }
