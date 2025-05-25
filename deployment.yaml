@@ -1,0 +1,25 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: flask-hello-deployment
+
+spec:
+  replicas: 3
+  selector: # Mandatory, selects the pods to manage
+    matchLabels:
+      app: flask-hello
+      tier: frontend
+
+  template: # pod definition
+    metadata:
+      name: flask-hello
+      labels:
+        app: flask-hello
+        tier: frontend
+
+    spec:
+      containers:
+        - name: flask-hello
+          image: azeemakhanum/flask-hello-world:latest
+          ports:
+            - containerPort: 5000
