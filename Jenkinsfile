@@ -27,14 +27,14 @@ pipeline {
                 bat 'docker push %DOCKER_HUB_REPO%:latest'
             }
         }
-        // stage('Deploy') {
-        //     steps {
-        //         echo 'Deploying....'
-        //         bat '"C:\\minikube\\minikube.exe" kubectl -- apply -f deployment.yaml'
-        //         bat '"C:\\minikube\\minikube.exe" kubectl -- apply -f service.yaml'
-        //     }
+        stage('Deploy') {
+            steps {
+                echo 'Deploying....'
+                bat '"C:\\minikube\\minikube.exe" kubectl -- apply -f deployment.yaml'
+                bat '"C:\\minikube\\minikube.exe" kubectl -- apply -f service.yaml'
+            }
 
-        // }
+        }
 
     }
 }
